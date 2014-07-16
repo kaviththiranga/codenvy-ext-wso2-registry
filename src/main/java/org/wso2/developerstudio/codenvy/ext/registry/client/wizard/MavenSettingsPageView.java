@@ -11,5 +11,20 @@ public interface MavenSettingsPageView extends View<MavenSettingsPageView.Action
 
     public interface ActionDelegate{
 
+        void onTextChange();
     }
+
+    void setArtifactId(String artifact);
+
+    void setGroupId(String group);
+
+    void setVersion(String value);
+
+    String getPackaging();
+
+    String getGroupId();
+
+    String getArtifactId();
+
+    String getVersion();
 }
