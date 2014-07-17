@@ -26,4 +26,8 @@ public interface Constants {
     String BUILDER_NAME = "builder.name";
     String BUILDER_MAVEN_SOURCE_FOLDERS = "builder.maven.source_folders";
     String RUNNER_NAME                  = "runner.name";
+    String MAVEN_ARTIFACT_ID = "-mvn-artifact-id";
+    String MAVEN_GROUP_ID = "mvn-group-id";
+    String MAVEN_VERSION = "mvn-version";
+    String MAVEN_PACKAGING = "mvn-packaging";
 }

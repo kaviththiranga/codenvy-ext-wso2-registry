@@ -10,7 +10,6 @@ import com.google.inject.ImplementedBy;
 public interface MavenSettingsPageView extends View<MavenSettingsPageView.ActionDelegate> {
 
     public interface ActionDelegate{
-
         void onTextChange();
     }
 

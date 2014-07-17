@@ -7,15 +7,19 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Singleton;
 
 /**
  * Created by kavith on 7/16/14.
  */
+@Singleton
 public class MavenSettingsPageViewImpl implements MavenSettingsPageView{
 
     private static MavenSettingsPageViewImplUiBinder uiBinder = GWT.create(MavenSettingsPageViewImplUiBinder.class);
 
     private final DockLayoutPanel rootElement;
+
+    private ActionDelegate delegate;
 
     @UiField
     TextBox versionField;
@@ -29,13 +33,12 @@ public class MavenSettingsPageViewImpl implements MavenSettingsPageView{
     interface MavenSettingsPageViewImplUiBinder extends UiBinder<DockLayoutPanel, MavenSettingsPageViewImpl>{}
 
     public MavenSettingsPageViewImpl() {
-
         rootElement = uiBinder.createAndBindUi(this);
     }
 
     @Override
     public void setDelegate(ActionDelegate delegate) {
-
+        this.delegate = delegate;
     }
 
     @Override
@@ -45,36 +48,36 @@ public class MavenSettingsPageViewImpl implements MavenSettingsPageView{
 
     @Override
     public void setArtifactId(String artifact) {
-
+        this.artifactId.setText(artifact);
     }
 
     @Override
     public void setGroupId(String group) {
-
+        this.groupId.setText(group);
     }
 
     @Override
     public void setVersion(String value) {
-
+        this.versionField.setText(value);
     }
 
     @Override
     public String getPackaging() {
-        return null;
+        return packagingField.getItemText(packagingField.getSelectedIndex());
     }
 
     @Override
     public String getGroupId() {
-        return null;
+        return groupId.getText();
     }
 
     @Override
     public String getArtifactId() {
-        return null;
+        return artifactId.getText();
     }
 
     @Override
     public String getVersion() {
-        return null;
+        return versionField.getText();
     }
 }
