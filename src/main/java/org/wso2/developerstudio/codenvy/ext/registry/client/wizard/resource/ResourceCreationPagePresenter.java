@@ -19,6 +19,7 @@ import org.wso2.developerstudio.codenvy.ext.registry.shared.Constants;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -181,5 +182,27 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
                             }
                         }
                 );
+        projectServiceClient.createFolder(name+"/src", new FolderCreationCallBack(callback));
+        projectServiceClient.createFolder(name+"/resources", new FolderCreationCallBack(callback));
+        projectServiceClient.createFile(name, "pom.xml", "testingContent","text/xml", new FolderCreationCallBack(callback));
+    }
+
+    class FolderCreationCallBack extends AsyncRequestCallback<Void> {
+
+        private WizardPage.CommitCallback callback;
+
+        protected FolderCreationCallBack(WizardPage.CommitCallback callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            callback.onSuccess();
+        }
+
+        @Override
+        protected void onFailure(Throwable exception) {
+            callback.onFailure(exception);
+        }
     }
 }

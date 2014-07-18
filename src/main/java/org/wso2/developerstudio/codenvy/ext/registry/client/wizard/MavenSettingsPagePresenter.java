@@ -79,6 +79,7 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
 
     @Override
     public void go(AcceptsOneWidget container) {
+        // Important - Set view as the widget
         container.setWidget(view);
         Project project = wizardContext.getData(ProjectWizard.PROJECT);
         if (project != null) {
