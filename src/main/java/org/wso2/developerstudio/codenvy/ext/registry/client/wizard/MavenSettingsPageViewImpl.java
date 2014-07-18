@@ -1,8 +1,10 @@
 package org.wso2.developerstudio.codenvy.ext.registry.client.wizard;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -41,6 +43,11 @@ public class MavenSettingsPageViewImpl implements MavenSettingsPageView{
         this.delegate = delegate;
     }
 
+    /**
+     * This will be called by project wizard window.
+     *
+     * @return
+     */
     @Override
     public Widget asWidget() {
         return rootElement;
@@ -80,4 +87,15 @@ public class MavenSettingsPageViewImpl implements MavenSettingsPageView{
     public String getVersion() {
         return versionField.getText();
     }
+
+    /**
+     * ActionListner for keyup event of text fields.
+     *
+     * @param event
+     */
+    @UiHandler({"versionField", "groupId", "artifactId"})
+    void onKeyUp(KeyUpEvent event) {
+        delegate.onTextChange();
+    }
+
 }

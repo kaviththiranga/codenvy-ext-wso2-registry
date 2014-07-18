@@ -1,10 +1,16 @@
 package org.wso2.developerstudio.codenvy.ext.registry.client.wizard.resource;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Singleton;
+import org.wso2.developerstudio.codenvy.ext.registry.client.wizard.MavenSettingsPageView;
 
 /**
  * Created by kavith on 7/17/14.
@@ -16,9 +22,26 @@ public class ResourceCreationPageViewImpl implements ResourceCreationPageView
 
     private DockLayoutPanel rootElement;
 
-    @Override
-    public void setDelegate(ActionDelegate delegate) {
+    private ActionDelegate delegate;
 
+    @UiField
+    TextBox versionField;
+    @UiField
+    TextBox groupId;
+    @UiField
+    TextBox artifactId;
+    @UiField
+    ListBox packagingField;
+
+    interface ResourceCreationPageViewImplUiBinder extends UiBinder<DockLayoutPanel, ResourceCreationPageViewImpl>{}
+
+    public ResourceCreationPageViewImpl() {
+        rootElement = uiBinder.createAndBindUi(this);
+    }
+
+    @Override
+    public void setDelegate(ResourceCreationPageViewImpl.ActionDelegate delegate) {
+        this.delegate = delegate;
     }
 
     @Override
@@ -26,11 +49,43 @@ public class ResourceCreationPageViewImpl implements ResourceCreationPageView
         return rootElement;
     }
 
-    interface ResourceCreationPageViewImplUiBinder extends UiBinder<DockLayoutPanel, ResourceCreationPageViewImpl>{}
+    @Override
+    public void setArtifactId(String artifact) {
+        this.artifactId.setText(artifact);
+    }
 
-    public ResourceCreationPageViewImpl() {
+    @Override
+    public void setGroupId(String group) {
+        this.groupId.setText(group);
+    }
 
-        rootElement = uiBinder.createAndBindUi(this);
+    @Override
+    public void setVersion(String value) {
+        this.versionField.setText(value);
+    }
 
+    @Override
+    public String getPackaging() {
+        return packagingField.getItemText(packagingField.getSelectedIndex());
+    }
+
+    @Override
+    public String getGroupId() {
+        return groupId.getText();
+    }
+
+    @Override
+    public String getArtifactId() {
+        return artifactId.getText();
+    }
+
+    @Override
+    public String getVersion() {
+        return versionField.getText();
+    }
+
+    @UiHandler({"versionField", "groupId", "artifactId"})
+    void onKeyUp(KeyUpEvent event) {
+        delegate.onTextChange();
     }
 }

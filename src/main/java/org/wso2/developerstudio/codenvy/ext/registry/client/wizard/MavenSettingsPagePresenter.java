@@ -11,6 +11,7 @@ import com.codenvy.ide.dto.DtoFactory;
 import com.codenvy.ide.rest.AsyncRequestCallback;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -47,6 +48,8 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
         super("Maven Attributes", null);
 
         this.view = view;
+        // Important step, set the action delegate of view
+        this.view.setDelegate(this);
         this.projectServiceClient = projectServiceClient;
         this.resourceProvider = resourceProvider;
         this.factory = factory;
@@ -93,7 +96,7 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
 
     @Override
     public boolean canSkip() {
-        return true;
+        return false;
     }
 
     @Override
@@ -102,6 +105,8 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
     }
     @Override
     public void commit(@NotNull final CommitCallback callback) {
+
+        Window.alert("wizard one");
         Map<String, List<String>> options = new HashMap<>();
         options.put(Constants.MAVEN_ARTIFACT_ID, Arrays.asList(view.getArtifactId()));
         options.put(Constants.MAVEN_GROUP_ID, Arrays.asList(view.getGroupId()));
@@ -142,6 +147,8 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
         } else {
             createProject(callback, projectDescriptor, name);
         }
+
+
     }
 
     private void updateProject(final Project project, ProjectDescriptor projectDescriptor, final CommitCallback callback) {
