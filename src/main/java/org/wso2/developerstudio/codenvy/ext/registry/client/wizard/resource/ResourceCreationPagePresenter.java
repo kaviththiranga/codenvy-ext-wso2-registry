@@ -88,21 +88,17 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
     public void commit(@NotNull final CommitCallback callback) {
         Window.alert("wizard two");
         Map<String, List<String>> options = new HashMap<>();
-        options.put(Constants.MAVEN_ARTIFACT_ID, Arrays.asList(view.getArtifactId()));
-        options.put(Constants.MAVEN_GROUP_ID, Arrays.asList(view.getGroupId()));
-        options.put(Constants.MAVEN_VERSION, Arrays.asList(view.getVersion()));
-        options.put(Constants.MAVEN_PACKAGING, Arrays.asList(view.getPackaging()));
-        if("war".equals(view.getPackaging())){
-            options.put(Constants.RUNNER_NAME, Arrays.asList("JavaWeb"));
-        }
-        if ("jar".equals(view.getPackaging())) {
-            options.put(Constants.RUNNER_NAME, Arrays.asList("JavaStandalone"));
-        }
+        options.put(Constants.MAVEN_ARTIFACT_ID, Arrays.asList(wizardContext.getData(Constants.WKEY_MAVEN_ARTIFACT_ID)));
+        options.put(Constants.MAVEN_GROUP_ID, Arrays.asList(wizardContext.getData(Constants.WKEY_MAVEN_GROUP_ID)));
+        options.put(Constants.MAVEN_VERSION, Arrays.asList(wizardContext.getData(Constants.WKEY_MAVEN_VERSION)));
+
         final ProjectDescriptor projectDescriptor = factory.createDto(ProjectDescriptor.class);
         projectDescriptor.withProjectTypeId(wizardContext.getData(ProjectWizard.PROJECT_TYPE).getProjectTypeId());
         projectDescriptor.setAttributes(options);
+
         boolean visibility = wizardContext.getData(ProjectWizard.PROJECT_VISIBILITY);
         projectDescriptor.setVisibility(visibility ? "public" : "private");
+
         final String name = wizardContext.getData(ProjectWizard.PROJECT_NAME);
         final Project project = wizardContext.getData(ProjectWizard.PROJECT);
         if (project != null) {
@@ -166,6 +162,7 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
                                 resourceProvider.getProject(name, new AsyncCallback<Project>() {
                                     @Override
                                     public void onSuccess(Project project) {
+                                        createFiles(project);// Continue after successfully creating the project
                                         callback.onSuccess();
                                     }
 
@@ -182,27 +179,26 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
                             }
                         }
                 );
-        projectServiceClient.createFolder(name+"/src", new FolderCreationCallBack(callback));
-        projectServiceClient.createFolder(name+"/resources", new FolderCreationCallBack(callback));
-        projectServiceClient.createFile(name, "pom.xml", "testingContent","text/xml", new FolderCreationCallBack(callback));
+   }
+
+    private void createFiles(Project project){
+
+        projectServiceClient.createFolder(project.getName()+"/src", new FolderCreationCallBack());
+        projectServiceClient.createFolder(project.getName()+"/resources", new FolderCreationCallBack());
+        //projectServiceClient.createFile(name, "pom.xml", "testingContent","text/xml", new FolderCreationCallBack(callback));
+
     }
 
     class FolderCreationCallBack extends AsyncRequestCallback<Void> {
 
-        private WizardPage.CommitCallback callback;
-
-        protected FolderCreationCallBack(WizardPage.CommitCallback callback) {
-            this.callback = callback;
-        }
-
         @Override
         protected void onSuccess(Void result) {
-            callback.onSuccess();
+
         }
 
         @Override
         protected void onFailure(Throwable exception) {
-            callback.onFailure(exception);
+
         }
     }
 }

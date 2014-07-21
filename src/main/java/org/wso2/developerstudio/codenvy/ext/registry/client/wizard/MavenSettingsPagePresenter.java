@@ -6,6 +6,7 @@ import com.codenvy.ide.api.resources.ResourceProvider;
 import com.codenvy.ide.api.resources.model.Project;
 import com.codenvy.ide.api.ui.wizard.AbstractWizardPage;
 import com.codenvy.ide.api.ui.wizard.ProjectWizard;
+import com.codenvy.ide.api.ui.wizard.WizardContext;
 import com.codenvy.ide.api.ui.wizard.WizardPage;
 import com.codenvy.ide.dto.DtoFactory;
 import com.codenvy.ide.rest.AsyncRequestCallback;
@@ -73,8 +74,14 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
     }
 
     @Override
-    public void removeOptions() {
+    public void storeOptions() {
+        wizardContext.putData(Constants.WKEY_MAVEN_ARTIFACT_ID, view.getArtifactId());
+        wizardContext.putData(Constants.WKEY_MAVEN_GROUP_ID, view.getGroupId());
+        wizardContext.putData(Constants.WKEY_MAVEN_VERSION, view.getVersion());
+    }
 
+    @Override
+    public void removeOptions() {
     }
 
     @Override
@@ -103,105 +110,5 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
     @Override
     public void onTextChange() {
         delegate.updateControls();
-    }
-    @Override
-    public void commit(@NotNull final CommitCallback callback) {
-
-        Window.alert("wizard one");
-        Map<String, List<String>> options = new HashMap<>();
-        options.put(Constants.MAVEN_ARTIFACT_ID, Arrays.asList(view.getArtifactId()));
-        options.put(Constants.MAVEN_GROUP_ID, Arrays.asList(view.getGroupId()));
-        options.put(Constants.MAVEN_VERSION, Arrays.asList(view.getVersion()));
-        options.put(Constants.MAVEN_PACKAGING, Arrays.asList(view.getPackaging()));
-        if("war".equals(view.getPackaging())){
-            options.put(Constants.RUNNER_NAME, Arrays.asList("JavaWeb"));
-        }
-        if ("jar".equals(view.getPackaging())) {
-            options.put(Constants.RUNNER_NAME, Arrays.asList("JavaStandalone"));
-        }
-        final ProjectDescriptor projectDescriptor = factory.createDto(ProjectDescriptor.class);
-        projectDescriptor.withProjectTypeId(wizardContext.getData(ProjectWizard.PROJECT_TYPE).getProjectTypeId());
-        projectDescriptor.setAttributes(options);
-        boolean visibility = wizardContext.getData(ProjectWizard.PROJECT_VISIBILITY);
-        projectDescriptor.setVisibility(visibility ? "public" : "private");
-        final String name = wizardContext.getData(ProjectWizard.PROJECT_NAME);
-        final Project project = wizardContext.getData(ProjectWizard.PROJECT);
-        if (project != null) {
-            if (project.getName().equals(name)) {
-                updateProject(project, projectDescriptor, callback);
-            } else {
-                projectServiceClient.rename(project.getPath(), name, null, new AsyncRequestCallback<Void>() {
-                    @Override
-                    protected void onSuccess(Void result) {
-                        project.setName(name);
-
-                        updateProject(project, projectDescriptor, callback);
-                    }
-
-                    @Override
-                    protected void onFailure(Throwable exception) {
-                        callback.onFailure(exception);
-                    }
-                });
-            }
-
-        } else {
-            createProject(callback, projectDescriptor, name);
-        }
-
-
-    }
-
-    private void updateProject(final Project project, ProjectDescriptor projectDescriptor, final CommitCallback callback) {
-        projectServiceClient.updateProject(project.getPath(), projectDescriptor, new AsyncRequestCallback<ProjectDescriptor>() {
-            @Override
-            protected void onSuccess(ProjectDescriptor result) {
-                resourceProvider.getProject(project.getName(), new AsyncCallback<Project>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        callback.onFailure(caught);
-                    }
-
-                    @Override
-                    public void onSuccess(Project result) {
-                        callback.onSuccess();
-                    }
-                });
-            }
-
-            @Override
-            protected void onFailure(Throwable exception) {
-                callback.onFailure(exception);
-            }
-        });
-    }
-
-    private void createProject(final CommitCallback callback, ProjectDescriptor projectDescriptor, final String name) {
-        projectServiceClient
-                .createProject(name, projectDescriptor,
-                        new AsyncRequestCallback<ProjectDescriptor>() {
-
-
-                            @Override
-                            protected void onSuccess(ProjectDescriptor result) {
-                                resourceProvider.getProject(name, new AsyncCallback<Project>() {
-                                    @Override
-                                    public void onSuccess(Project project) {
-                                        callback.onSuccess();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Throwable caught) {
-                                        callback.onFailure(caught);
-                                    }
-                                });
-                            }
-
-                            @Override
-                            protected void onFailure(Throwable exception) {
-                                callback.onFailure(exception);
-                            }
-                        }
-                );
     }
 }

@@ -1,5 +1,7 @@
 package org.wso2.developerstudio.codenvy.ext.registry.shared;
 
+import com.codenvy.ide.api.ui.wizard.WizardContext;
+
 /**
  * Created by kavith on 7/15/14.
  */
@@ -30,4 +32,9 @@ public interface Constants {
     String MAVEN_GROUP_ID = "mvn-group-id";
     String MAVEN_VERSION = "mvn-version";
     String MAVEN_PACKAGING = "mvn-packaging";
+
+    // Keys for wizard context
+    WizardContext.Key<String> WKEY_MAVEN_ARTIFACT_ID = new WizardContext.Key<String>(Constants.MAVEN_ARTIFACT_ID);
+    WizardContext.Key<String> WKEY_MAVEN_GROUP_ID = new WizardContext.Key<String>(Constants.MAVEN_GROUP_ID);
+    WizardContext.Key<String> WKEY_MAVEN_VERSION= new WizardContext.Key<String>(Constants.MAVEN_VERSION);
 }
