@@ -2,6 +2,8 @@ package org.wso2.developerstudio.codenvy.ext.registry.client.wizard.resource;
 
 import com.codenvy.api.project.gwt.client.ProjectServiceClient;
 import com.codenvy.api.project.shared.dto.ProjectDescriptor;
+import com.codenvy.ide.api.notification.Notification;
+import com.codenvy.ide.api.notification.NotificationManager;
 import com.codenvy.ide.api.resources.ResourceProvider;
 import com.codenvy.ide.api.resources.model.Project;
 import com.codenvy.ide.api.ui.wizard.AbstractWizardPage;
@@ -35,6 +37,8 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
     private final ProjectServiceClient projectServiceClient;
     private final ResourceProvider     resourceProvider;
     private final DtoFactory           factory;
+    private final NotificationManager notificationManager;
+    private Notification projectCreationStatusNotification;
 
     /**
      * Create wizard page with given caption and image.
@@ -44,9 +48,10 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
     public ResourceCreationPagePresenter(ResourceCreationPageView view,
                                          ProjectServiceClient projectServiceClient,
                                          ResourceProvider resourceProvider,
-                                         DtoFactory factory) {
-        super("Create Resource", null);
+                                         DtoFactory factory, NotificationManager notificationManager) {
+        super("Create a Resource", null);
         this.view = view;
+        this.notificationManager = notificationManager;
         this.view.setDelegate(this);
         this.projectServiceClient = projectServiceClient;
         this.resourceProvider = resourceProvider;
@@ -86,7 +91,7 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
 
     @Override
     public void commit(@NotNull final CommitCallback callback) {
-        Window.alert("wizard two");
+
         Map<String, List<String>> options = new HashMap<>();
         options.put(Constants.MAVEN_ARTIFACT_ID, Arrays.asList(wizardContext.getData(Constants.WKEY_MAVEN_ARTIFACT_ID)));
         options.put(Constants.MAVEN_GROUP_ID, Arrays.asList(wizardContext.getData(Constants.WKEY_MAVEN_GROUP_ID)));
@@ -162,8 +167,9 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
                                 resourceProvider.getProject(name, new AsyncCallback<Project>() {
                                     @Override
                                     public void onSuccess(Project project) {
-                                        createFiles(project);// Continue after successfully creating the project
                                         callback.onSuccess();
+                                        createFiles(project);// Continue after successfully creating the project
+
                                     }
 
                                     @Override
@@ -183,14 +189,40 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
 
     private void createFiles(Project project){
 
-        projectServiceClient.createFolder(project.getName()+"/src", new FolderCreationCallBack());
-        projectServiceClient.createFolder(project.getName()+"/resources", new FolderCreationCallBack());
-        //projectServiceClient.createFile(name, "pom.xml", "testingContent","text/xml", new FolderCreationCallBack(callback));
+        projectCreationStatusNotification = new Notification("creating necessary files ", Notification.Status.PROGRESS);
+        notificationManager.showNotification(projectCreationStatusNotification);
+
+        projectServiceClient.createFolder(project.getName()+"/src", new EmptyCallback());
+        projectServiceClient.createFolder(project.getName()+"/resources", new EmptyCallback());
+        projectServiceClient.createFile(project.getName(), "pom.xml", "testingContent","text/xml", new AsyncRequestCallback<Void>() {
+            @Override
+            protected void onSuccess(Void result) {
+                projectCreationStatusNotification.setMessage("Project creation successful");
+                projectCreationStatusNotification.setStatus(Notification.Status.FINISHED);
+
+                resourceProvider.getActiveProject().refreshChildren(new AsyncCallback<Project>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Project result) {
+
+                    }
+                });
+            }
+
+            @Override
+            protected void onFailure(Throwable exception) {
+
+            }
+        });
+
 
     }
 
-    class FolderCreationCallBack extends AsyncRequestCallback<Void> {
-
+    static class EmptyCallback extends AsyncRequestCallback<Void> {
         @Override
         protected void onSuccess(Void result) {
 
