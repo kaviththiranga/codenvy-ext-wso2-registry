@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.codenvy.ext.registry.client.wizard;
+package org.wso2.developerstudio.codenvy.ext.registry.client.wizard.maven;
 
 import com.codenvy.ide.api.mvp.View;
 import com.google.inject.ImplementedBy;

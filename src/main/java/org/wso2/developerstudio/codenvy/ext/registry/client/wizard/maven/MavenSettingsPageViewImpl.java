@@ -1,4 +1,4 @@
-package org.wso2.developerstudio.codenvy.ext.registry.client.wizard;
+package org.wso2.developerstudio.codenvy.ext.registry.client.wizard.maven;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.KeyUpEvent;

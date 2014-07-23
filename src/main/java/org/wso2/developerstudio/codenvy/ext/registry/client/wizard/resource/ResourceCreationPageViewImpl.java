@@ -10,7 +10,6 @@ import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Singleton;
-import org.wso2.developerstudio.codenvy.ext.registry.client.wizard.MavenSettingsPageView;
 
 /**
  * Created by kavith on 7/17/14.

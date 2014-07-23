@@ -8,20 +8,19 @@ import com.codenvy.ide.api.resources.ResourceProvider;
 import com.codenvy.ide.api.resources.model.Project;
 import com.codenvy.ide.api.ui.wizard.AbstractWizardPage;
 import com.codenvy.ide.api.ui.wizard.ProjectWizard;
-import com.codenvy.ide.api.ui.wizard.WizardPage;
 import com.codenvy.ide.dto.DtoFactory;
 import com.codenvy.ide.rest.AsyncRequestCallback;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.wso2.developerstudio.codenvy.ext.registry.client.WSO2RegistryExtensionResources;
+import org.wso2.developerstudio.codenvy.ext.registry.client.i18n.LocalizationConstants;
+import org.wso2.developerstudio.codenvy.ext.registry.client.i18n.LocalizationMessages;
 import org.wso2.developerstudio.codenvy.ext.registry.shared.Constants;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +38,9 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
     private final DtoFactory           factory;
     private final NotificationManager notificationManager;
     private Notification projectCreationStatusNotification;
+    private final LocalizationConstants localizedConstants;
+    private final LocalizationMessages localizedMessages;
+    private final WSO2RegistryExtensionResources resources;
 
     /**
      * Create wizard page with given caption and image.
@@ -48,10 +50,16 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
     public ResourceCreationPagePresenter(ResourceCreationPageView view,
                                          ProjectServiceClient projectServiceClient,
                                          ResourceProvider resourceProvider,
-                                         DtoFactory factory, NotificationManager notificationManager) {
-        super("Create a Resource", null);
+                                         DtoFactory factory, NotificationManager notificationManager,
+                                         LocalizationConstants localizedConstants,
+                                         LocalizationMessages localizedMessages,
+                                         WSO2RegistryExtensionResources resources) {
+        super(localizedConstants.createResourceWizardPageTitle(), null);
         this.view = view;
         this.notificationManager = notificationManager;
+        this.localizedConstants = localizedConstants;
+        this.localizedMessages = localizedMessages;
+        this.resources = resources;
         this.view.setDelegate(this);
         this.projectServiceClient = projectServiceClient;
         this.resourceProvider = resourceProvider;
@@ -187,17 +195,17 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
                 );
    }
 
-    private void createFiles(Project project){
+    private void createFiles(final Project project){
 
-        projectCreationStatusNotification = new Notification("creating necessary files ", Notification.Status.PROGRESS);
+        projectCreationStatusNotification = new Notification(localizedMessages.fileCreationStartedMsg(project.getName()), Notification.Status.PROGRESS);
         notificationManager.showNotification(projectCreationStatusNotification);
 
         projectServiceClient.createFolder(project.getName()+"/src", new EmptyCallback());
         projectServiceClient.createFolder(project.getName()+"/resources", new EmptyCallback());
-        projectServiceClient.createFile(project.getName(), "pom.xml", "testingContent","text/xml", new AsyncRequestCallback<Void>() {
+        projectServiceClient.createFile(project.getName(), "pom.xml", resources.defaultPOMFile().getSafeUri().asString(),"text/xml", new AsyncRequestCallback<Void>() {
             @Override
             protected void onSuccess(Void result) {
-                projectCreationStatusNotification.setMessage("Project creation successful");
+                projectCreationStatusNotification.setMessage(localizedMessages.fileCreationFinishedMsg(project.getName()));
                 projectCreationStatusNotification.setStatus(Notification.Status.FINISHED);
 
                 resourceProvider.getActiveProject().refreshChildren(new AsyncCallback<Project>() {

@@ -1,30 +1,19 @@
-package org.wso2.developerstudio.codenvy.ext.registry.client.wizard;
+package org.wso2.developerstudio.codenvy.ext.registry.client.wizard.maven;
 
 import com.codenvy.api.project.gwt.client.ProjectServiceClient;
-import com.codenvy.api.project.shared.dto.ProjectDescriptor;
 import com.codenvy.ide.api.resources.ResourceProvider;
 import com.codenvy.ide.api.resources.model.Project;
 import com.codenvy.ide.api.ui.wizard.AbstractWizardPage;
 import com.codenvy.ide.api.ui.wizard.ProjectWizard;
-import com.codenvy.ide.api.ui.wizard.WizardContext;
-import com.codenvy.ide.api.ui.wizard.WizardPage;
 import com.codenvy.ide.dto.DtoFactory;
-import com.codenvy.ide.rest.AsyncRequestCallback;
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.resources.client.ImageResource;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.wso2.developerstudio.codenvy.ext.registry.client.i18n.LocalizationConstants;
 import org.wso2.developerstudio.codenvy.ext.registry.shared.Constants;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by kavith on 7/16/14.
@@ -36,6 +25,7 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
     private final ProjectServiceClient projectServiceClient;
     private final ResourceProvider     resourceProvider;
     private final DtoFactory           factory;
+    private final LocalizationConstants localizedConstants;
 
     /**
      * Create wizard page with given caption and image.
@@ -45,10 +35,11 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
     public MavenSettingsPagePresenter(MavenSettingsPageView view,
                                       ProjectServiceClient projectServiceClient,
                                       ResourceProvider resourceProvider,
-                                      DtoFactory factory) {
-        super("Maven Attributes", null);
+                                      DtoFactory factory, LocalizationConstants localizedConstants) {
+        super(localizedConstants.mavenWizardPageTitle(), null);
 
         this.view = view;
+        this.localizedConstants = localizedConstants;
         // Important step, set the action delegate of view
         this.view.setDelegate(this);
         this.projectServiceClient = projectServiceClient;
@@ -82,6 +73,9 @@ public class MavenSettingsPagePresenter extends AbstractWizardPage implements Ma
 
     @Override
     public void removeOptions() {
+        wizardContext.removeData(Constants.WKEY_MAVEN_ARTIFACT_ID);
+        wizardContext.removeData(Constants.WKEY_MAVEN_VERSION);
+        wizardContext.removeData(Constants.WKEY_MAVEN_GROUP_ID);
     }
 
     @Override
