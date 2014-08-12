@@ -202,7 +202,7 @@ public class ResourceCreationPagePresenter extends AbstractWizardPage implements
 
         projectServiceClient.createFolder(project.getName()+"/src", new EmptyCallback());
         projectServiceClient.createFolder(project.getName()+"/resources", new EmptyCallback());
-        projectServiceClient.createFile(project.getName(), "pom.xml", resources.defaultPOMFile().getSafeUri().asString(),"text/xml", new AsyncRequestCallback<Void>() {
+        projectServiceClient.createFile(project.getName(), "pom.xml", "testContent", "text/xml", new AsyncRequestCallback<Void>() {
             @Override
             protected void onSuccess(Void result) {
                 projectCreationStatusNotification.setMessage(localizedMessages.fileCreationFinishedMsg(project.getName()));

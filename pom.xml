@@ -32,7 +32,15 @@
             <version>${com.google.gwt.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.googlecode.gwtquery</groupId>
+            <artifactId>gwtquery</artifactId>
+            <version>1.4.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
+
     <repositories>
         <repository>
             <id>codenvy-public-repo</id>
